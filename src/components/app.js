@@ -6,7 +6,9 @@ class App {
   }
 
   loadApp = () => {
-    HomePage();
+    const home = new HomePage();
+    console.log(home);
+    home.render();
   };
 }
 

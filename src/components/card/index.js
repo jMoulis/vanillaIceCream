@@ -1,23 +1,23 @@
 import { css } from 'emotion';
-import { Div } from '../../htmlElements/Div';
-import Button from '../../htmlElements/Button';
-import ListItem from '../../htmlElements/ListItem';
-import { Ul } from '../../htmlElements/Ul';
+import {
+  Div,
+  Ul,
+  Button,
+  Li,
+  Span,
+  Input,
+} from '../../htmlElements/HTMlElement';
 import TextNode from '../../htmlElements/Text';
 import {
   findAnElement,
   findParent,
   findNextElement,
-  findNextElementPosition,
 } from '../../service/domNavigation';
 import {
   deleteElement,
   addToDom,
   removeElement,
 } from '../../service/actionOnDom';
-import Input from '../../htmlElements/Input';
-import cards from '../../data/cards';
-import Span from '../../htmlElements/Span';
 
 const card = css({
   display: 'flex',
@@ -42,12 +42,13 @@ const cardContent = css({
 });
 
 class Card {
-  constructor(container, cardItem) {
+  constructor(container, cardItem, callback) {
     this.container = container;
     this.cardItem = cardItem;
     this.inputValue = '';
     this.listsItems = cardItem.list;
     this.domChanges = {};
+    this.callback = callback;
   }
 
   domChange = element => {
@@ -58,23 +59,25 @@ class Card {
 
   addToArray = (array, item, callback) => {
     array.push(item);
+    this.callback(array);
     callback();
   };
 
-  setInputValue = ({ value }) => {
-    this.inputValue = value;
-    return value;
+  setInputValue = input => {
+    this.inputValue = input.value;
   };
 
   render = () => {
     return this.container.appendChild(
       Div({
+        tag: 'div',
         className: card,
         attributes: {
           'data-position': 1,
         },
         children: [
           Div({
+            tag: 'div',
             className: cardHeader,
             children: [TextNode(this.cardItem.title)],
             attributes: {
@@ -82,19 +85,22 @@ class Card {
             },
           }),
           Div({
+            tag: 'div',
             className: cardContent,
             attributes: {
               'data-position': 2,
             },
             children: [
               Ul({
+                tag: 'ul',
                 attributes: {
                   'data-position': 1,
                 },
                 children:
                   this.listsItems && this.listsItems.length > 0
                     ? this.listsItems.map((item, index) =>
-                        ListItem({
+                        Li({
+                          tag: 'li',
                           attributes: {
                             id: index + 1,
                             'data-position': index + 1,
@@ -102,6 +108,7 @@ class Card {
                           children: [
                             TextNode(item.content),
                             Button({
+                              tag: 'button',
                               attributes: {
                                 'data-position': 1,
                               },
@@ -120,6 +127,7 @@ class Card {
                     : [TextNode('No Item yet')],
               }),
               Input({
+                tag: 'input',
                 attributes: {
                   type: 'text',
                   name: 'newItem',
@@ -128,11 +136,14 @@ class Card {
                 actions: {
                   onchange: ({ target }) => {
                     this.setInputValue(target);
-                    this.domChange(target);
+                  },
+                  onkeypress: ({ target }) => {
+                    this.setInputValue(target);
                   },
                 },
               }),
               Button({
+                tag: 'button',
                 actions: {
                   onclick: evt => {
                     const parent = findAnElement({
@@ -148,6 +159,7 @@ class Card {
                       const parent = findParent({ element: evt.target });
                       return parent.insertBefore(
                         Span({
+                          tag: 'span',
                           children: [TextNode('Fill in a text first')],
                         }),
                         evt.target
@@ -161,10 +173,12 @@ class Card {
                       },
                       () => {
                         parent.appendChild(
-                          ListItem({
+                          Li({
+                            tag: 'li',
                             children: [
                               TextNode(this.inputValue),
                               Button({
+                                tag: 'button',
                                 children: [TextNode('Delete')],
                                 actions: {
                                   onclick: ({ target }) => {

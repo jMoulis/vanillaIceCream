@@ -1,6 +1,6 @@
 import { css } from 'emotion';
 import Card from '../card';
-import { Div } from '../../htmlElements/Div';
+import { Div } from '../../htmlElements/HTMlElement';
 import cards from '../../data/cards';
 
 const className = css({
@@ -8,17 +8,32 @@ const className = css({
   flexWrap: 'wrap',
 });
 
-const HomePage = () => {
-  const container = Div({
-    tag: 'main',
-    attributes: {
-      id: 'main',
-    },
-    className,
-  });
+class HomePage {
+  constructor() {
+    this.cards = cards;
+  }
 
-  document.getElementById('root').appendChild(container);
-  cards.map(card => new Card(container, card).render());
-};
+  handleChildChange = dataChanged => {
+    if (this.cards !== dataChanged) {
+      this.render();
+      this.cards = dataChanged;
+    }
+  };
+
+  render = () => {
+    const container = Div({
+      tag: 'main',
+      attributes: {
+        id: 'main',
+      },
+      className,
+    });
+
+    document.getElementById('root').appendChild(container);
+    this.cards.map(card =>
+      new Card(container, card, this.handleChildChange).render()
+    );
+  };
+}
 
 export default HomePage;
