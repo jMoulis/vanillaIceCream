@@ -1,0 +1,9 @@
+{
+  "presets": ["es2017"],
+  "plugins": [
+    "emotion",
+    "transform-class-properties",
+    "syntax-dynamic-import",
+    "transform-object-rest-spread"
+  ]
+}
