@@ -1,11 +1,13 @@
 module.exports = {
-  extends: 'airbnb-base',
+  extends: ['airbnb-base', 'prettier'],
   parser: 'babel-eslint',
+  plugins: ['prettier'],
   env: {
     browser: true,
   },
   rules: {
-    'brace-style': ['error', 'stroustrup'],
+    'prettier/prettier': ['error'],
+    'brace-style': ['off'],
     'arrow-parens': ['off'],
     'no-param-reassign': ['error', { props: false }],
     'no-mixed-operators': ['error', { allowSamePrecedence: true }],
