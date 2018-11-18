@@ -1,13 +1,10 @@
 const replaceUppercaseCharacterByLowerCaseAndSymbol = (char, symbole) => {
-  let response = '';
-  for (let i = 0; i < char.length; i += 1) {
-    if (char[i] === char[i].toUpperCase()) {
-      response = `${response}${symbole}${char[i].toLowerCase()}`;
-    } else {
-      response = `${response}${char[i]}`;
+  return Array.from(char).reduce((response, value) => {
+    if (value === value.toUpperCase()) {
+      return `${response}${symbole}${value.toLowerCase()}`;
     }
-  }
-  return response;
+    return `${response}${value}`;
+  }, '');
 };
 
 const randomClassName = () => {

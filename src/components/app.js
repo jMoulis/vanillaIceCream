@@ -1,36 +1,89 @@
 /* eslint-disable no-restricted-syntax */
-import Button from './Button';
-import { componentDidChange } from '../utils/utils';
+import ComponentType from './ComponentType';
+import UsersList from './UsersList';
+import Span from './DomElement';
+import NavBar from './NavBar';
 
-const Span = props => {
-  const span = document.createElement('span');
-  span.textContent = 'Je suis un span';
-  return span;
-};
-
-const style = () => ({
-  backgroundColor: 'green',
-  fontWeight: 'bold',
-});
-
-class App {
+class App extends ComponentType {
   constructor(props) {
+    super(props);
     this.props = props;
     this.root = document.getElementById('root');
+    this.state = {
+      users: [],
+      data: 'data.json',
+    };
+    this.init();
   }
 
-  loadApp = () => {
-    const button = new Button({
-      attributes: {
-        name: 'button',
-        type: 'button',
-        onClick: event => console.log(event.target),
-        className: style(),
-        style: {},
+  init = () => {
+    this.fetchData();
+  };
+
+  fetchData = async () => {
+    try {
+      const response = await fetch(this.state.data);
+      if (response.status !== 200)
+        throw Error(
+          `Error while fetching data. Code error: ${response.status} `,
+        );
+      const users = await response.json();
+      this.setState(prevState => ({
+        ...prevState,
+        users,
+      }));
+    } catch (error) {
+      this.setState(prevState => ({ ...prevState, error: error.message }));
+    }
+  };
+
+  error = errorMessage => {
+    const span = document.createElement('span');
+    span.textContent = errorMessage;
+    return span;
+  };
+
+  setGoodDataFileName = () => {
+    this.fetchData();
+  };
+
+  addNewKeyInStateAction = () => {
+    this.setState(prevState => ({
+      ...prevState,
+      user: 'New Key',
+    }));
+  };
+
+  renderList = () => {
+    const usersList = new UsersList(this.state.users);
+    this.root.appendChild(usersList.render());
+  };
+
+  addUser = () => {
+    this.setState(prevState => ({
+      ...prevState,
+      test: 'test',
+      users: [...prevState.users, { name: 'libéti', age: '12' }],
+    }));
+  };
+
+  render = () => {
+    NavBar({
+      actions: {
+        setGoodDataFileNameAction: this.setGoodDataFileName,
+        addUserAction: this.addUser,
+        addNewKeyInStateAction: this.addNewKeyInStateAction,
       },
-      children: [Span(), 'test', '<i class="fas fa-ad"></i>'],
     });
-    this.root.appendChild(button.render());
+    if (this.state.error) {
+      return this.root.appendChild(
+        new Span({
+          domElement: 'span',
+          attributes: { name: 'test', textContent: this.state.error },
+        }).render(),
+      );
+    }
+    return this.renderList();
   };
 }
 
