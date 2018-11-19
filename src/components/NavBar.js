@@ -1,8 +1,21 @@
 import DomElement from './DomElement';
+import { withStyles } from '../utils/cssInJs';
+
+const style = {
+  button: {
+    color: 'green',
+    '&:hover': {
+      color: 'blue',
+      cursor: 'pointer',
+    },
+  },
+};
 
 const NavBar = ({
   actions: { setGoodDataFileNameAction, addUserAction, addNewKeyInStateAction },
 }) => {
+  const classes = withStyles(style);
+
   const addOneUserButton = new DomElement({
     tagName: 'button',
     container: document.getElementById('root'),
@@ -11,7 +24,7 @@ const NavBar = ({
       type: 'button',
       textContent: 'Add one User',
       onClick: addUserAction,
-      style: {},
+      className: [classes.button, 'test'],
     },
   });
   addOneUserButton.render();
@@ -24,7 +37,9 @@ const NavBar = ({
       type: 'button',
       textContent: 'FetchData',
       onClick: setGoodDataFileNameAction,
-      style: {},
+      style: {
+        backgroundColor: 'gray',
+      },
     },
   });
   fetchDataButton.render();
@@ -36,8 +51,6 @@ const NavBar = ({
       name: 'button',
       type: 'button',
       textContent: 'addNewKey',
-      onClick: addNewKeyInStateAction,
-      style: {},
     },
   });
   addNewKey.render();

@@ -1,16 +1,10 @@
-import {
-  setDomElementFromStringToArray,
-  parseEvent,
-  parseCssSelectorCamelCase,
-  style,
-} from '../utils/utils';
+import { setDomElementFromStringToArray, parseEvent } from '../utils/utils';
 import ComponentType from './ComponentType';
 
 class DomElement extends ComponentType {
   constructor(props) {
     super(props);
     this.props = props;
-    this.state = {};
   }
 
   render = () => {
@@ -39,17 +33,17 @@ class DomElement extends ComponentType {
               this.props.attributes[key],
             );
           } else if (key === 'className') {
-            if (this.props.attributes[key] instanceof Object) {
+            if (Array.isArray(this.props.attributes[key])) {
               return domElement.setAttribute(
                 'class',
-                style(this.props.attributes[key]),
+                this.props.attributes[key].join(' '),
               );
             }
+            return domElement.setAttribute('class', this.props.attributes[key]);
           } else if (key === 'style') {
-            return domElement.setAttribute(
-              'style',
-              parseCssSelectorCamelCase(this.props.attributes[key]),
-            );
+            return Object.keys(this.props.attributes[key]).forEach(styleKey => {
+              domElement.style[styleKey] = this.props.attributes[key][styleKey];
+            });
           } else {
             return domElement.setAttribute(key, this.props.attributes[key]);
           }

@@ -1,8 +1,8 @@
 /* eslint-disable no-restricted-syntax */
 import ComponentType from './ComponentType';
 import UsersList from './UsersList';
-import Span from './DomElement';
 import NavBar from './NavBar';
+import DomElement from './DomElement';
 
 class App extends ComponentType {
   constructor(props) {
@@ -13,12 +13,9 @@ class App extends ComponentType {
       users: [],
       data: 'data.json',
     };
-    this.init();
-  }
-
-  init = () => {
+    this.store = new props.Store({ name: 'main' });
     this.fetchData();
-  };
+  }
 
   fetchData = async () => {
     try {
@@ -28,23 +25,15 @@ class App extends ComponentType {
           `Error while fetching data. Code error: ${response.status} `,
         );
       const users = await response.json();
+      this.store.addToStore({ users });
       this.setState(prevState => ({
         ...prevState,
         users,
       }));
+      return users;
     } catch (error) {
       this.setState(prevState => ({ ...prevState, error: error.message }));
     }
-  };
-
-  error = errorMessage => {
-    const span = document.createElement('span');
-    span.textContent = errorMessage;
-    return span;
-  };
-
-  setGoodDataFileName = () => {
-    this.fetchData();
   };
 
   addNewKeyInStateAction = () => {
@@ -60,29 +49,38 @@ class App extends ComponentType {
   };
 
   addUser = () => {
-    this.setState(prevState => ({
-      ...prevState,
-      test: 'test',
-      users: [...prevState.users, { name: 'libéti', age: '12' }],
-    }));
+    this.setState(prevState => {
+      this.store.addToStore({
+        users: [...prevState.users, { name: 'libéti', age: '12' }],
+      });
+      return {
+        ...prevState,
+        test: 'test',
+        users: [...prevState.users, { name: 'libéti', age: '12' }],
+      };
+    });
   };
 
   render = () => {
     NavBar({
       actions: {
-        setGoodDataFileNameAction: this.setGoodDataFileName,
+        setGoodDataFileNameAction: this.fetchData,
         addUserAction: this.addUser,
         addNewKeyInStateAction: this.addNewKeyInStateAction,
       },
     });
-    if (this.state.error) {
-      return this.root.appendChild(
-        new Span({
-          domElement: 'span',
-          attributes: { name: 'test', textContent: this.state.error },
-        }).render(),
-      );
-    }
+    document.getElementById('root').appendChild(
+      new DomElement({
+        tagName: 'span',
+        children: [
+          `<span>${
+            this.store.getStore().main.users
+              ? this.store.getStore().main.users.length
+              : ''
+          }</span>`,
+        ],
+      }).render(),
+    );
     return this.renderList();
   };
 }
